@@ -153,4 +153,3 @@ Navigate to `http://localhost:8000/` to access the Employer Dashboard and create
 **Janavi Singh** *Final Year B.Tech Student | AI-ML Engineer Intern* * Passionate about building low-latency, full-stack AI/ML applications.
 
 [LinkedIn](https://www.linkedin.com/in/janavi-singh/) | [Portfolio](https://janavisingh.vercel.app/)
-```
