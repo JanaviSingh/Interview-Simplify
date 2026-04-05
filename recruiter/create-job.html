@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Campaign | InterviewSimplify </title>
+    <style>
+        /* Exact same sidebar/layout CSS as dashboard.html */
+        :root { --primary: #4f46e5; --sidebar-bg: #1e1b4b; --bg: #f8fafc; --text: #1f2937; --border: #e2e8f0; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
+        .sidebar { width: 260px; background: var(--sidebar-bg); color: white; display: flex; flex-direction: column; }
+        .sidebar-header { padding: 24px; font-size: 20px; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .nav-links { padding: 20px 0; list-style: none; margin: 0; flex-grow: 1; }
+        .nav-links li { padding: 12px 24px; font-size: 15px; cursor: pointer; display: flex; align-items: center; gap: 10px; color: #a5b4fc; }
+        .nav-links li.active { background: var(--primary); color: white; border-left: 4px solid white; }
+        .nav-links a { text-decoration: none; color: inherit; display: block; width: 100%; }
+        .main-content { flex-grow: 1; display: flex; flex-direction: column; overflow-y: auto; }
+        .topbar { background: white; padding: 20px 30px; border-bottom: 1px solid var(--border); }
+        
+        /* Form specific styles */
+        .content-area { padding: 30px; display: flex; justify-content: center; }
+        .form-card { background: white; width: 100%; max-width: 700px; padding: 40px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-weight: 600; font-size: 13px; margin-bottom: 8px; color: var(--text); }
+        .form-control { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; box-sizing: border-box; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .btn-submit { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px;}
+        .btn-submit:disabled { background: #94a3b8; }
+        #status { margin-top: 15px; padding: 12px; border-radius: 6px; font-size: 14px; display: none; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">🤖 InterviewSimplify</div>
+        <ul class="nav-links">
+            <li><a href="/admin/dashboard">📊 Dashboard</a></li>
+            <li class="active">➕ Create Interview</li>
+            <li style="margin-top: auto;"><a href="/admin/login">🚪 Logout</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="topbar"><h2 style="margin: 0; font-size: 20px;">InterviewSimplify AI Interview</h2></div>
+        
+        <div class="content-area">
+            <div class="form-card">
+                <form id="job-form">
+                    <div class="grid-2">
+                        <div class="form-group"><label>Job ID</label><input type="text" id="contest_id" class="form-control" required></div>
+                        <div class="form-group"><label>Recruiter ID</label><input type="text" id="recruiter_id" class="form-control" required></div>
+                    </div>
+                    <div class="form-group"><label>Candidate ID</label><input type="text" id="js_id" class="form-control" required></div>
+                    <div class="form-group"><label>Upload Job Description</label><input type="file" id="jd_file" class="form-control" required></div>
+                    <div class="form-group"><label>Upload Resume</label><input type="file" id="resume_file" class="form-control" required></div>
+                    
+                    <button type="submit" id="btn-submit" class="btn-submit">Generate & Send Invite</button>
+                    <div id="status"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('job-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-submit');
+            const status = document.getElementById('status');
+            btn.disabled = true; btn.innerText = "Parsing AI Data..."; status.style.display = 'none';
+
+            const fd = new FormData();
+            fd.append('contest_id', document.getElementById('contest_id').value);
+            fd.append('recruiter_id', document.getElementById('recruiter_id').value);
+            fd.append('js_id', document.getElementById('js_id').value);
+            fd.append('jd_file', document.getElementById('jd_file').files[0]);
+            fd.append('resume_file', document.getElementById('resume_file').files[0]);
+
+            try {
+                const res = await fetch('/prepare-interview/', { method: 'POST', body: fd });
+                const json = await res.json();
+                if (res.ok) {
+                    status.style.display = 'block'; status.style.background = '#d1fae5'; status.style.color = '#065f46';
+                    status.innerText = "✅ Interview prepared and email sent!";
+                    e.target.reset();
+                } else throw new Error();
+            } catch(e) {
+                status.style.display = 'block'; status.style.background = '#fee2e2'; status.style.color = '#b91c1c';
+                status.innerText = "❌ Failed to create interview.";
+            } finally {
+                btn.disabled = false; btn.innerText = "Generate & Send Invite";
+            }
+        });
+    </script>
+</body>
+</html>
