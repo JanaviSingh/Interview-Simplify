@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Interview | InterviewSimplify</title>
+    <link rel="icon" href="data:,">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --danger: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text-main); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .app-container { background: var(--card-bg); width: 100%; max-width: 1000px; border-radius: 16px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); overflow: hidden; margin: 20px; }
+
+        .screen { display: none; }
+        .screen.active { display: block; animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Welcome */
+        .welcome-screen { padding: 60px 40px; text-align: center; }
+        .welcome-icon { font-size: 48px; margin-bottom: 20px; }
+        .welcome-screen h1 { font-size: 28px; margin: 0 0 15px 0; }
+        .welcome-screen p { color: var(--text-muted); font-size: 16px; max-width: 600px; margin: 0 auto 40px auto; line-height: 1.6; }
+        .mic-test-box { background: #f1f5f9; border: 1px solid var(--border); border-radius: 12px; padding: 30px; max-width: 400px; margin: 0 auto 30px auto; }
+        .mic-status { font-weight: 600; margin-bottom: 15px; color: var(--text-muted); }
+        .visualizer-container { height: 10px; background: #e2e8f0; border-radius: 5px; overflow: hidden; margin-bottom: 20px; }
+        .visualizer-bar { height: 100%; width: 0%; background: var(--success); transition: width 0.1s ease; }
+        .btn-primary { background: var(--primary); color: white; border: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); }
+        .btn-primary:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; }
+
+        /* Interview Room */
+        .header { padding: 20px 30px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .header h2 { margin: 0; font-size: 18px; display: flex; align-items: center; gap: 10px; }
+        .session-badge { color: var(--text-muted); font-size: 13px; background: #f1f5f9; padding: 6px 12px; border-radius: 20px; border: 1px solid var(--border); }
+        .split-layout { display: flex; gap: 30px; padding: 30px; align-items: stretch; }
+        .ai-side, .candidate-side { flex: 1; display: flex; flex-direction: column; gap: 20px; }
+        @media (max-width: 768px) { .split-layout { flex-direction: column; } }
+        .q-counter { background: #e0e7ff; color: var(--primary); padding: 6px 14px; border-radius: 12px; font-size: 13px; font-weight: 700; align-self: flex-start; text-transform: uppercase; letter-spacing: 0.5px; display: none; }
+        .ai-bubble { background: #f8fafc; padding: 30px; border-radius: 12px; border-left: 4px solid var(--primary); flex-grow: 1; display: flex; align-items: center; }
+        #ai-message { font-size: 18px; line-height: 1.6; margin: 0; font-weight: 500; }
+        .record-indicator { background: var(--text-muted); color: white; padding: 16px; border-radius: 12px; font-size: 16px; font-weight: 600; text-align: center; transition: all 0.3s ease; display: flex; justify-content: center; align-items: center; gap: 10px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .status-box { font-size: 14px; color: var(--text-muted); font-style: italic; text-align: center; padding: 15px; background: #f8fafc; border-radius: 8px; border: 1px solid var(--border); }
+        .transcript-box { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 20px; display: none; flex-grow: 1; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
+        .transcript-label { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .live-dot { width: 8px; height: 8px; background-color: var(--danger); border-radius: 50%; animation: pulse-red 1.5s infinite; }
+        .transcript-text { font-size: 15px; color: var(--primary); line-height: 1.5; font-style: italic; font-weight: 500;}
+
+        /* Complete */
+        .complete-screen { padding: 80px 40px; text-align: center; }
+        .complete-icon { font-size: 64px; color: var(--success); margin-bottom: 20px; }
+
+        @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+        .pulse { animation: pulse-green 1.5s infinite; background: var(--success) !important; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <div id="screen-welcome" class="screen active welcome-screen">
+            <div class="welcome-icon">👋</div>
+            <h1>Welcome to your AI Interview</h1>
+            <p>This is a fully automated, conversational interview. Tara (our AI) will ask you questions, and your microphone will open automatically so you can reply naturally.</p>
+            
+            <div class="mic-test-box">
+                <div class="mic-status" id="mic-status-text">We need to test your microphone.</div>
+                <div class="visualizer-container"><div class="visualizer-bar" id="mic-bar"></div></div>
+                <button id="btn-request-mic" class="btn-primary" style="padding: 10px 20px; font-size: 14px;">Allow Microphone</button>
+            </div>
+            <button id="btn-start-interview" class="btn-primary" disabled>Start Interview</button>
+        </div>
+
+        <div id="screen-interview" class="screen">
+            <div class="header">
+                <h2><span style="font-size: 20px;">🎙️</span> InterviewSimplify</h2>
+                <span class="session-badge" id="header-session-id"></span>
+            </div>
+            <div class="split-layout">
+                <div class="ai-side">
+                    <div id="q-counter" class="q-counter">Preparing...</div>
+                    <div class="ai-bubble"><p id="ai-message">Connecting to secure server...</p></div>
+                </div>
+                <div class="candidate-side">
+                    <div id="record-indicator" class="record-indicator">⏳ Connecting...</div>
+                    <div id="status-box" class="status-box">Please wait...</div>
+                    <div id="live-transcript-box" class="transcript-box">
+                        <div class="transcript-label"><div class="live-dot"></div> Live Captions</div>
+                        <div id="live-transcript-text" class="transcript-text">Listening...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="screen-complete" class="screen complete-screen">
+            <div class="complete-icon">✅</div>
+            <h1>Interview Completed!</h1>
+            <p style="color: var(--text-muted); font-size: 16px; max-width: 500px; margin: 0 auto;">Your responses have been successfully recorded and securely submitted to the recruitment team.</p>
+            <p style="margin-top: 30px; font-weight: 600; color: var(--primary);">You may now close this window.</p>
+        </div>
+
+    </div>
+
+    <audio id="audio-player" autoplay></audio>
+
+    <script src="/static/js/webrtc.js"></script>
+
+    <script>
+        const sessionId = "SESSION_ID_PLACEHOLDER";
+        document.getElementById('header-session-id').innerText = `ID: ${sessionId}`;
+
+        const screenWelcome = document.getElementById('screen-welcome');
+        const screenInterview = document.getElementById('screen-interview');
+        const screenComplete = document.getElementById('screen-complete');
+        
+        const btnRequestMic = document.getElementById('btn-request-mic');
+        const btnStartInterview = document.getElementById('btn-start-interview');
+        const micBar = document.getElementById('mic-bar');
+        const micStatusText = document.getElementById('mic-status-text');
+
+        const aiMessage = document.getElementById("ai-message");
+        const qCounter = document.getElementById('q-counter');
+        const recordIndicator = document.getElementById("record-indicator");
+        const statusBox = document.getElementById("status-box");
+        const transcriptBox = document.getElementById("live-transcript-box");
+        const transcriptText = document.getElementById("live-transcript-text");
+        const audioPlayer = document.getElementById("audio-player");
+
+        // --- INITIALIZE THE EXTERNAL ENGINE ---
+        const streamer = new InterviewStreamer(sessionId, {
+            onConnect: () => {
+                console.log("Connected to secure socket.");
+            },
+            onAIQuestion: (data) => {
+                aiMessage.innerText = data.text;
+                if (data.current_q_num && data.total_q_num) {
+                    qCounter.innerText = `Question ${data.current_q_num} of ${data.total_q_num}`;
+                    qCounter.style.display = 'inline-block';
+                }
+                
+                recordIndicator.innerText = "Tara is speaking...";
+                recordIndicator.style.background = "var(--text-muted)"; 
+                recordIndicator.classList.remove("pulse");
+                statusBox.innerText = "Listen to the question carefully.";
+                transcriptBox.style.display = "none";
+
+                if (data.audio_base64) {
+                    audioPlayer.src = "data:audio/mp3;base64," + data.audio_base64;
+                    audioPlayer.onended = () => {
+                        if (data.type !== "interview_complete") streamer.startRecording();
+                    };
+                }
+            },
+            onInterimTranscript: (text) => {
+                transcriptText.innerText = text;
+            },
+            onFinalTranscript: (text) => {
+                statusBox.innerText = "Answer captured. Evaluating...";
+                transcriptText.innerText = text;
+            },
+            onInterviewComplete: () => {
+                screenInterview.classList.remove('active');
+                screenComplete.classList.add('active');
+            },
+            onError: (msg) => {
+                statusBox.innerText = msg;
+                statusBox.style.color = "var(--danger)";
+            },
+            onSilenceDetect: (state) => {
+                if (state === "listening") {
+                    recordIndicator.innerText = "Listening...";
+                    recordIndicator.style.background = "var(--primary)";
+                    recordIndicator.classList.add("pulse");
+                    statusBox.innerText = "Recording... (Auto-submits when you pause)";
+                    transcriptBox.style.display = "block";
+                    if (transcriptText.innerText === "") transcriptText.innerText = "Listening...";
+                } else if (state === "processing") {
+                    recordIndicator.innerText = "Analyzing...";
+                    recordIndicator.style.background = "var(--warning)"; 
+                    recordIndicator.classList.remove("pulse");
+                    statusBox.innerText = "Processing your answer...";
+                }
+            }
+        });
+
+        // --- STEP 1: MIC TEST ---
+        btnRequestMic.addEventListener('click', async () => {
+            try {
+                // Unlock browser autoplay
+                audioPlayer.src = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA";
+                audioPlayer.play().catch(e => console.log(e));
+
+                // Request via our new class
+                const stream = await streamer.requestMicrophone();
+
+                micStatusText.innerText = "Microphone connected! Speak to test.";
+                micStatusText.style.color = "var(--success)";
+                btnRequestMic.style.display = "none";
+                btnStartInterview.disabled = false;
+
+                // Visualizer hookup
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const analyser = audioCtx.createAnalyser();
+                const source = audioCtx.createMediaStreamSource(stream);
+                source.connect(analyser);
+                const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+                function testMicLevel() {
+                    if (screenWelcome.classList.contains('active')) {
+                        analyser.getByteFrequencyData(dataArray);
+                        let volume = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
+                        micBar.style.width = Math.min(volume * 2, 100) + "%";
+                        requestAnimationFrame(testMicLevel);
+                    }
+                }
+                testMicLevel();
+
+            } catch (err) {
+                micStatusText.innerText = "Access denied. Please allow microphone permissions.";
+                micStatusText.style.color = "var(--danger)";
+            }
+        });
+
+        // --- STEP 2: START INTERVIEW ---
+        btnStartInterview.addEventListener('click', () => {
+            screenWelcome.classList.remove('active');
+            screenInterview.classList.add('active');
+            streamer.connect();
+        });
+    </script>
+</body>
+</html>
