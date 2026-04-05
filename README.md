@@ -75,7 +75,7 @@ Here is the engineering breakdown of the model evolution within this project:
 
 | Model Version | Hosted Region | Network Ping | Est. UI Latency | Accuracy & Localization Profile | Verdict for Real-Time AI |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Chirp** | `us-central1` | ~60ms | 1.5 - 2 seconds | **High.** Great for Indian English (`en-IN`). Built-in SNR noise filtering. | maintains natural conversational flow.| **🏆 The Production Winner.** The instant word-by-word UI feedback heavily outweighs minor grammatical errors for the user experience. |
+| **Chirp** | `us-central1` | ~60ms | 1.5 - 2 seconds | **High.** Great for Technical English words and Indian accents. Built-in SNR noise filtering. | maintains natural conversational flow.| **🏆 The Production Winner.** The instant word-by-word UI feedback heavily outweighs minor grammatical errors for the user experience. |
 
 ---
 
