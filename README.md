@@ -106,7 +106,7 @@ Here is the engineering breakdown of the model evolution within this project:
 
 ### **2. Clone the Repository**
 ```bash
-git clone [https://github.com/JanaviSingh/Interview-Simplify.git](https://github.com/JanaviSingh/Interview-Simplify.git)
+git clone https://github.com/JanaviSingh/Interview-Simplify.git
 cd Interview-Simplify
 ```
 
